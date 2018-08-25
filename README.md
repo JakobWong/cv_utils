@@ -13,8 +13,8 @@ python uncalibrated_rectify.py img1 img2 0
 - Demo
     - Before rectification
 
-    ![before_rectification](https://github.com/JakobWong/cv_utils/demo_rectify/before_rectification.png)
+    ![before_rectification](https://github.com/JakobWong/cv_utils/blob/master/demo_rectify/before_rectification.png)
     
     - After rectification
 
-    ![after_rectification](https://github.com/JakobWong/cv_utils/demo_rectify/before_rectification.png)
+    ![after_rectification](https://github.com/JakobWong/cv_utils/blob/master/demo_rectify/after_rectification.png)
