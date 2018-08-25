@@ -57,7 +57,7 @@ def drawlines(img1,img2,lines,pts1,pts2):
 
 MIN_MATCH_COUNT = 10
 
-def rectify(I1, I2):
+def rectify(I1, I2, keep_which = 0):
     if I1.shape != I2.shape:
         raise ValueError ("left/right images must have the same dimensions")
     
@@ -103,7 +103,7 @@ def rectify(I1, I2):
 
         pts1 = np.int32(pts1)
         pts2 = np.int32(pts2)   
-        F, mask = cv2.findFundamentalMat(pts1,pts2,cv2.FM_RANSAC,5.0)
+        F, mask = cv2.findFundamentalMat(pts1,pts2,cv2.RANSAC)
         matchesMask = mask.ravel().tolist()
 
         # We select only inlier points
@@ -119,8 +119,15 @@ def rectify(I1, I2):
         warp_mat_1 = np.mat(homo1)
         warp_mat_2 = np.mat(homo2)
 
-        I1_rectified = cv2.warpPerspective(I1, warp_mat_1, (width, height))
-        I2_rectified = cv2.warpPerspective(I2, warp_mat_2, (width, height))
+        if keep_which == 0:
+            I1_rectified = I1
+            I2_rectified = cv2.warpPerspective(I2, np.linalg.inv(warp_mat_1) * warp_mat_2, (width, height))
+        elif keep_which == 1:
+            I1_rectified = cv2.warpPerspective(I1, np.linalg.inv(warp_mat_2) * warp_mat_1, (width, height))
+            I2_rectified = I2
+        else:
+            I1_rectified = cv2.warpPerspective(I1, warp_mat_1, (width, height))
+            I2_rectified = cv2.warpPerspective(I2, warp_mat_2, (width, height))
 
         # Display anaglyph images
         # show_anaglyph(I1_rectified,I2_rectified)
@@ -152,10 +159,11 @@ if __name__ == '__main__':
     # File names
     I1_name, I1_ext = os.path.splitext(sys.argv[1])
     I2_name, I2_ext = os.path.splitext(sys.argv[2])
+    keep_which = int(sys.argv[3])
 
     # Read images and rectify them
     I1 = cv2.imread (sys.argv[1])
     I2 = cv2.imread (sys.argv[2])
-    I1_rectified, I2_rectified = rectify (I1, I2)
+    I1_rectified, I2_rectified = rectify (I1, I2, keep_which)
     cv2.imwrite (I1_name+"-rectified"+I1_ext, I1_rectified)
     cv2.imwrite (I2_name+"-rectified"+I2_ext, I2_rectified)
